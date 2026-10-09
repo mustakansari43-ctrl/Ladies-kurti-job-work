@@ -20,23 +20,24 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android
-        uses: android-actions/setup-android@v3
-
       - name: Extract project
         run: |
           mkdir project
           unzip -o *.zip -d project
 
-      - name: Find and build APK
+      - name: Find Gradle project
         run: |
           GRADLEW=$(find project -name gradlew -type f | head -1)
           if [ -z "$GRADLEW" ]; then
             echo "gradlew नहीं मिला"
-            find project -maxdepth 4 -type f | head -100
+            find project -maxdepth 5 -type f | head -100
             exit 1
           fi
           chmod +x "$GRADLEW"
+          echo "GRADLEW=$GRADLEW" >> $GITHUB_ENV
+
+      - name: Build APK
+        run: |
           cd "$(dirname "$GRADLEW")"
           ./gradlew assembleDebug
 
